@@ -2,7 +2,7 @@
 
 const { ServiceProvider } = require('@adonisjs/fold')
 
-const NAMESPACE = 'Adonis/Addons/Feathers'
+const NAMESPACE = 'Backwood/Feathers'
 
 class FeathersProvider extends ServiceProvider {
 

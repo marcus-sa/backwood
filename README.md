@@ -2,11 +2,13 @@
 Backwood Feathers is a [Service Provider](https://adonisjs.com/docs/4.0/service-providers) for [AdonisJS](https://github.com/adonisjs/adonis-framework)
 for people that enjoy FeathersJS but can't stand its way of file and coding structuring.
 
+**Full docs will come soon**
+
 ## Installation
 ```bash
-npm install --save @backwood/feathers
+npm install --save backwood-feathers backwood-feathers-rest
 
-yarn add --save @backwood/feathers
+yarn add --save backwood-feathers backwood-feathers-rest
 ```
 
 ## Usage
@@ -38,8 +40,8 @@ and add the Backwood providers to the application
 
 ```js
 const providers = [
-    '@backwood/feathers',
-    '@backwood/rest'
+    'backwood-feathers',
+    'backwood-feathers-rest'
 ]
 ```
 
