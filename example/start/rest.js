@@ -17,12 +17,3 @@ Rest
   .group(() => {
     Rest.get('/test', 'TestController.get')
   }).middleware('test')
-  /*group(() => {
-    Rest.get('get', async (req, res) => {
-      res.send('lol')
-    })
-  }).options({
-    namespace: 'Lol',
-    prefix: 'users',
-    //middleware: 'users'
-  })*/

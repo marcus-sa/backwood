@@ -1,5 +1,5 @@
 {
-  "name": "backwood-feathers",
+  "name": "@backwood/feathers",
   "version": "1.0.0",
   "description": "Feathers provider for Adonis",
   "main": "index.js",

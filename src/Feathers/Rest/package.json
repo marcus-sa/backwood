@@ -1,5 +1,5 @@
 {
-  "name": "backwood-feathers-rest",
+  "name": "@backwood/rest",
   "version": "1.0.0",
   "description": "Feathers REST API provider for Adonis",
   "main": "index.js",
