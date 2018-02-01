@@ -1,0 +1,36 @@
+{
+  "name": "cyclonejs",
+  "version": "0.0.1",
+  "adonis-version": "4.0.0",
+  "description": "Adonis Feathers provider",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -w providers -w start -w app -w config -w database -i public -x node --trace-warnings server.js",
+    "start": "node server.js",
+    "test": "node ace test"
+  },
+  "keywords": [
+    "adonisjs",
+    "adonis-app"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "lodash": "*",
+    "@feathersjs/express": "^1.1.2",
+    "@feathersjs/feathers": "^3.1.0"
+  },
+  "devDependencies": {
+    "ws": "^4.0.0",
+    "nodemon": "^1.14.11",
+    "@feathersjs/primus": "^3.1.0",
+    "@adonisjs/ace": "^4.0.7",
+    "@adonisjs/fold": "^4.0.5",
+    "@adonisjs/framework": "^4.0.28",
+    "@adonisjs/ignitor": "^1.0.14",
+  },
+  "autoload": {
+    "App": "./app"
+  }
+}
