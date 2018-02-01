@@ -1,6 +1,6 @@
 {
   "name": "backwood-feathers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Feathers provider for Adonis",
   "main": "index.js",
   "private": false,
