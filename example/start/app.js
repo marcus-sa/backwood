@@ -1,5 +1,7 @@
 'use strict'
 
+const path = require('path')
+
 /*
 |--------------------------------------------------------------------------
 | Providers
@@ -11,8 +13,8 @@
 |
 */
 exports.providers = [
-  require('path').join(__dirname, '..', 'providers', 'Feathers'),
-  require('path').join(__dirname, '..', 'providers', 'Feathers', 'Rest'),
+  path.join(__dirname, '..', '..', 'src', 'Feathers'),
+  path.join(__dirname, '..', '..', 'src', 'Feathers', 'Rest'),
   '@adonisjs/framework/providers/AppProvider',
 ]
 

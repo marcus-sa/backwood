@@ -1,0 +1,16 @@
+{
+  "name": "backwood-feathers-rest",
+  "version": "1.0.0",
+  "description": "Feathers REST API provider for Adonis",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "lodash": "*",
+    "@adonisjs/fold": "*",
+    "@feathersjs/express": "*"
+  },
+  "author": "Marcus S. Abildskov",
+  "license": "MIT"
+}
