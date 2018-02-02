@@ -1,3 +1,7 @@
+'use strict'
+
+exports.error = 'Lol'
+
 exports.before = class MessageHooksBefore {
 
 }

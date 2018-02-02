@@ -3,7 +3,9 @@
 const Rest = use('Rest')
 
 exports.globalMiddleware = [
-  Rest.express.json()
+  Rest.express.json(),
+  Rest.express.urlencoded({ extended: true }),
+
 ]
 
 exports.namedMiddleware = {
@@ -13,7 +15,8 @@ exports.namedMiddleware = {
   }
 }
 
-Rest
-  .group(() => {
-    Rest.get('/test', 'TestController.get')
-  }).middleware('test')
+//Rest
+  //.group(() => {
+    Rest.get('test', 'TestController.get')
+    Rest.service('message', 'MessageService')
+  //}).middleware('test')

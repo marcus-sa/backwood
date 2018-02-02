@@ -16,8 +16,11 @@ class FeathersProvider extends ServiceProvider {
 
       return new Feathers(app, Config, Env, Helpers)
     })
-
     this.app.alias(NAMESPACE, 'Feathers')
+
+    this.app.singleton(`${NAMESPACE}/Service`, () => require('./Service'))
+    this.app.alias(`${NAMESPACE}/Service`, 'Service')
+    this.app.alias(`${NAMESPACE}/Service`, 'Hooks')
   }
 
   boot() {

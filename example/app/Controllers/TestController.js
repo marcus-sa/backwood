@@ -1,7 +1,7 @@
 module.exports = class TestController {
 
-  get() {
-
+  get(req, res) {
+    res.send('lol')
   }
 
 }

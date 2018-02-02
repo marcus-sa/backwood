@@ -4,6 +4,8 @@ const _ = require('lodash')
 const path = require('path')
 const feathers = require('@feathersjs/feathers')
 
+const Service = require('./Service')
+
 module.exports = class Feathers {
 
   constructor(Ioc, Config, Env, Helpers) {
@@ -20,14 +22,30 @@ module.exports = class Feathers {
     this.app = feathers()
   }
 
-  _createClosure(path, name) {
-    return this._ioc._makeInstanceOf(this._ioc.use(`${path}/${name}`))
+  _createService(name) {
+    const Module = this._ioc.use(`${this._servicesPath}/${name}`)
+
+    this._validateService(Module)
+
+    return new Module(this.app)
+
+    //return this._ioc._makeInstanceOf(this._ioc.use(`${path}/${name}`))
+  }
+
+  _validateService(Module) {
+    if (Module.prototype instanceof Service === false) {
+        throw new Error(`${Module.name} must extend base Service class`)
+    }
+  }
+
+  _createClosureHooks(name) {
+    return this._ioc.use(`${this._hooksPath}/${name}`)
   }
 
   _createHooks(name, closure) {
     this._services[this._serviceBreakpoint].hooks[name] = (
       typeof closure === 'string'
-        ? this._createClosure(this._hooksPath, closure)
+        ? this._createClosureHooks(closure)
         : closure
     )
 
@@ -43,23 +61,25 @@ module.exports = class Feathers {
   _start(adonis) {
     this._start = require(path.join(this._helpers.appRoot(), 'start', 'feathers.js'))
 
-    Object.keys(this._services).forEach(serviceName => {
-      const service = this._services[serviceName]
-      this.app.use(serviceName, service.closure)
+    Object.keys(this._services)
+      .filter(service => !service.express)
+      .forEach(serviceName => {
+        const service = this._services[serviceName]
+        this.app.use(serviceName, service.closure)
 
-      if (service.hooks) {
-        this.app.service(serviceName).hooks(service.hooks)
-      }
-    })
+        if (service.hooks) {
+          this.app.service(serviceName).hooks(service.hooks)
+        }
+      })
 
     this.app.listen(this._config.port)
     console.log('Feathers App is listening on port:', this._config.port)
   }
 
-  service(name, closure) {
+  service(name, closure, express = false) {
     if (!closure) {
       if (!this._services[name]) {
-        throw new Error('Service doesnt exist yet')
+        throw new Error(`${name} service doesn't exist yet`)
       }
 
       return this.app.service(name)
@@ -68,12 +88,15 @@ module.exports = class Feathers {
     this._serviceBreakpoint = name
 
     if (typeof closure === 'string') {
-      closure = this._createClosure(this._servicesPath, closure)
+      closure = this._createService(closure)
     }
 
     this._services[name] = {
       closure,
-      hooks: {}
+      express,
+      hooks: typeof closure.hooks === 'function'
+        ? closure.hooks()
+        : {}
     }
 
     return this
@@ -91,7 +114,7 @@ module.exports = class Feathers {
     return this
   }
 
-  hooksBefore(closure) {
+  before(closure) { // beforeHooks
     this._validateServiceBreakpoint()
 
     this._createHooks('before', closure)
@@ -99,7 +122,7 @@ module.exports = class Feathers {
     return this
   }
 
-  hooksAfter(closure) {
+  after(closure) { // afterHooks
     this._validateServiceBreakpoint()
 
     this._createHooks('after', closure)
@@ -107,17 +130,21 @@ module.exports = class Feathers {
     return this
   }
 
-  hooks(closure) {
+  getServices(name) {
+    return name ? this._services[name] : this._services
+  }
+
+  /*hooks(closure) {
     this._validateServiceBreakpoint()
 
     if (typeof closure === 'string') {
-      closure = this._createClosure(this._hooksPath, closure)
+      closure = this._createClosureHooks(closure)
     }
 
     this._services[this._serviceBreakpoint].hooks = closure
     this._serviceBreakpoint = null
 
     return this
-  }
+  }*/
 
 }
