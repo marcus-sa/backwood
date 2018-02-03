@@ -32,7 +32,6 @@ module.exports = class Route {
   }
 
   _validateHandler(handler) {
-    console.log(handler)
     if (!['string', 'function'].includes(typeof handler)) {
       throw new Error('Cannot instantiate route without route handler')
     }

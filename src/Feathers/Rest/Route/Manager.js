@@ -26,7 +26,6 @@ module.exports = class RouteManager {
   }
 
   route(method, route, handler) {
-    console.log(handler)
     const routeInstance = new Route(method, route, handler)
     this.routeStore.add(routeInstance)
 

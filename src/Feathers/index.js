@@ -23,7 +23,6 @@ class FeathersProvider extends ServiceProvider {
   }
 
   boot() {
-    console.log('boot')
     this.app.use(NAMESPACE)._start(this.app)
   }
 
