@@ -1,10 +1,11 @@
 'use strict'
 
 const Service = use('Service')
+const Users = use('Users')
 
 class MessageService extends Service {
 
-  hooks() {
+  static get hooks() {
     return {
       before: {
         create(ctx) {
@@ -16,8 +17,9 @@ class MessageService extends Service {
   }
 
   async get(id, params) {
+    console.log(this.config)
     console.log(id, params) // gets logged, but request results in 404?
-    return { id, params }
+    return await Users.getById(1)
   }
 
 }

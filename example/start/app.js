@@ -14,6 +14,7 @@ const path = require('path')
 */
 exports.providers = [
   path.join(__dirname, '..', '..', 'src', 'Feathers'),
+  path.join(__dirname, '..', '..', 'src', 'Feathers', 'Sequelize'),
   path.join(__dirname, '..', '..', 'src', 'Feathers', 'Rest'),
   '@adonisjs/framework/providers/AppProvider',
 ]
@@ -54,3 +55,8 @@ exports.aliases = {}
 |
 */
 exports.commands = []
+
+
+exports.models = {
+  Users: 'App/Models/UserModel'
+}

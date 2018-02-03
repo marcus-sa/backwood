@@ -14,20 +14,23 @@ module.exports = class Feathers {
     this._env = Env.get('NODE_ENV')
     this._helpers = Helpers
 
+    this._booted = false
+    this._dependencyBreakpoint = null
     this._serviceBreakpoint = null
     this._services = {}
+    this._resolvers = []
     this._servicesPath = 'App/Services'
     this._hooksPath = 'App/Services/Hooks'
 
     this.app = feathers()
   }
 
-  _createService(name) {
-    const Module = this._ioc.use(`${this._servicesPath}/${name}`)
+  _createService(name, dependencies = null) {
+    const Service = this._ioc.use(`${this._servicesPath}/${name}`)
 
-    this._validateService(Module)
+    this._validateService(Service)
 
-    return new Module(this.app)
+    return new Service(dependencies)
 
     //return this._ioc._makeInstanceOf(this._ioc.use(`${path}/${name}`))
   }
@@ -38,7 +41,7 @@ module.exports = class Feathers {
     }
   }
 
-  _createClosureHooks(name) {
+  /*_createClosureHooks(name) {
     return this._ioc.use(`${this._hooksPath}/${name}`)
   }
 
@@ -50,7 +53,7 @@ module.exports = class Feathers {
     )
 
     this._serviceBreakpoint = null
-  }
+  }*/
 
   _validateServiceBreakpoint() {
     if (!this._serviceBreakpoint) {
@@ -58,17 +61,32 @@ module.exports = class Feathers {
     }
   }
 
+  _validateDependencyBreakpoint() {
+    if (!this._dependencyBreakpoint) {
+      throw new Error('No dependency breakpoint')
+    }
+  }
+
   _start(adonis) {
     this._start = require(path.join(this._helpers.appRoot(), 'start', 'feathers.js'))
+
+    console.log(this._resolvers)
 
     Object.keys(this._services)
       .filter(service => !service.express)
       .forEach(serviceName => {
-        const service = this._services[serviceName]
-        this.app.use(serviceName, service.closure)
+        const { closure, express, dependencies } = this._services[serviceName]
+
+        const service = typeof closure === 'string'
+          ? this._createService(closure, dependencies)
+          : closure
+
+        const app = express
+          ? use('Rest').app.use(serviceName, service)
+          : this.app
 
         if (service.hooks) {
-          this.app.service(serviceName).hooks(service.hooks)
+          app.service(serviceName).hooks(service.hooks)
         }
       })
 
@@ -76,27 +94,31 @@ module.exports = class Feathers {
     console.log('Feathers App is listening on port:', this._config.port)
   }
 
+  addResolver(handler) {
+    this._resolvers.push(handler)
+  }
+
   service(name, closure, express = false) {
     if (!closure) {
       if (!this._services[name]) {
         throw new Error(`${name} service doesn't exist yet`)
+      } else if (!this._booted) {
+        throw new Error(`Feathers has not booted yet`)
       }
 
       return this.app.service(name)
     }
 
+    this._dependencyBreakpoint = name
     this._serviceBreakpoint = name
 
-    if (typeof closure === 'string') {
+    /*if (typeof closure === 'string') {
       closure = this._createService(closure)
-    }
+    }*/
 
     this._services[name] = {
       closure,
-      express,
-      hooks: typeof closure.hooks === 'function'
-        ? closure.hooks()
-        : {}
+      express
     }
 
     return this
@@ -126,6 +148,16 @@ module.exports = class Feathers {
     this._validateServiceBreakpoint()
 
     this._createHooks('after', closure)
+
+    return this
+  }
+
+  dependencies(dependencies = []) {
+    this._validateDependencyBreakpoint()
+
+    this._services[this._dependencyBreakpoint].dependencies = dependencies.map(dependency => {
+      return this._ioc.use(dependency)
+    })
 
     return this
   }

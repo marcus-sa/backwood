@@ -19,7 +19,7 @@ module.exports = class Rest extends RouteManager {
     this._ioc = Ioc
     this.express = express
     this.feathers = Feathers
-    this.app = express(Feathers.app).configure(express.rest())//express(Feathers.app)
+    this.app = express(Feathers.app)//express(Feathers.app)
   }
 
   _createNamedMiddleware(namedMiddleware = {}) {
@@ -46,6 +46,7 @@ module.exports = class Rest extends RouteManager {
 
   _start(options) {
     const start = require(path.join(this._helpers.appRoot(), 'start', 'rest.js'))
+    this.app.configure(express.rest())
 
     const globalMiddleware = this._createGlobalMiddleware(start.globalMiddleware)
     const namedMiddleware = this._createNamedMiddleware(start.namedMiddleware)
@@ -56,14 +57,14 @@ module.exports = class Rest extends RouteManager {
 
       const slashes = route.route[0] === '/' ? '' : '/'
       const path = route.prefix.join('/') + slashes + route.route
-      const middleware = [globalMiddleware, route.middleware.map(
-          (name) => namedMiddleware[name]
-      )]
 
       if (route.method === 'service') {
-        const service = this.feathers.getServices(route.route)
+        const { closure } = this.feathers.getServices(route.route)
+        const service = typeof closure === 'string'
+          ? this.feathers._createService(closure)
+          : closure
 
-        this.app.use(path, service.closure)//...middleware.concat(service.closure))
+        this.app.use(path, service)//...middleware.concat(service.closure))
 
         if (service.hooks) {
           this.app.service(path).hooks(service.hooks)
@@ -72,9 +73,15 @@ module.exports = class Rest extends RouteManager {
         return null
       }
 
+      const middleware = route.middleware.map(
+          (name) => namedMiddleware[name]
+      ).concat(globalMiddleware)
+
       if (typeof route.handler === 'string') {
           route.handler = this._createHandler(this._controllersPath, ...route.namespace, route.handler)
       }
+
+      console.log(path, route.method)
 
       this.app[route.method](path, ...middleware.concat(route.handler))
     })
@@ -86,27 +93,27 @@ module.exports = class Rest extends RouteManager {
   service(name, closure) {
     this.feathers.service(name, closure, true)
 
+    //console.log(this.feathers.service(name))
+
     this.route('service', name, closure)
 
     return this
   }
 
-  before(closure) {
-    this.feathers.before(closure)
+  dependencies(dependencies) {
+    this.feathers.dependencies(dependencies)
 
     return this
   }
 
   before(closure) { // beforeHooks
-    this.feathers._validateServiceBreakpoint()
-    this.feathers._createHooks('before', closure)
+    this.feathers.before(closure)
 
     return this
   }
 
   after(closure) { // afterHooks
-    this.feathers._validateServiceBreakpoint()
-    this.feathers._createHooks('after', closure)
+    this.feathers.after(closure)
 
     return this
   }
