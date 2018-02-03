@@ -1,7 +1,5 @@
 'use strict'
 
-console.log('start/app')
-
 const Rest = use('Rest')
 
 exports.globalMiddleware = [

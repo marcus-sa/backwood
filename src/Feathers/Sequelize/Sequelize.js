@@ -30,13 +30,10 @@ module.exports = class FeathersSequelize {
             }
         )
 
-        console.log(connection)
-
         this._models = {}
     }
 
     _start() {
-      console.log('Sequelize')
         const { models } = require(path.join(this._helpers.appRoot(), 'start', 'app.js'))
 
         Object.keys(models).forEach(modelName => {
@@ -47,14 +44,12 @@ module.exports = class FeathersSequelize {
                   throw new Error(`${model.name} model must extend base model class`)
                 }
 
-                const options = _.mergeWith(model.options, {
-                /*  instanceMethods: model.prototype,
+                /*const options = _.mergeWith(model.options, {
+                  instanceMethods: model.prototype,
                   classMethods: Object.getOwnPropertyNames(model).map(method => {
                     return model[method]
-                  }).filter(method => typeof method === 'function')*/
-                })
-
-                console.log(options)
+                  }).filter(method => typeof method === 'function')
+                })*/
 
                 const sequelizeModel = this.sequelize.define(
                     model.tableName,
@@ -77,7 +72,8 @@ module.exports = class FeathersSequelize {
                 this._models[modelName] = sequelizeModel
 
                 this._rest.app.use(model.tableName, service({
-                    Model: sequelizeModel
+                    Model: sequelizeModel,
+                    paginate: model.paginate
                 }))
 
                 return sequelizeModel

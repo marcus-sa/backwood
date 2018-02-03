@@ -18,15 +18,12 @@ class FeathersRestProvider extends ServiceProvider {
       return new Rest(app, Feathers, Config, Env, Helpers)
     })
 
-    //this.app.use('Feathers').addResolver(`${NAMESPACE}._start`)
-
     this.app.alias(NAMESPACE, 'Rest')
   }
 
 
   boot() {
     this.app.use(NAMESPACE)._start()
-
   }
 
 }
