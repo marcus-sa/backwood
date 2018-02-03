@@ -19,7 +19,7 @@ module.exports = class Rest extends RouteManager {
     this._ioc = Ioc
     this.express = express
     this.feathers = Feathers
-    this.app = express(Feathers.app).configure(express.rest())//express(Feathers.app)
+    this.app = express(Feathers.app)//express(Feathers.app)
   }
 
   _createNamedMiddleware(namedMiddleware = {}) {
@@ -46,6 +46,7 @@ module.exports = class Rest extends RouteManager {
 
   _start(options) {
     const start = require(path.join(this._helpers.appRoot(), 'start', 'rest.js'))
+    this.app.configure(express.rest())
 
     const globalMiddleware = this._createGlobalMiddleware(start.globalMiddleware)
     const namedMiddleware = this._createNamedMiddleware(start.namedMiddleware)
@@ -91,22 +92,14 @@ module.exports = class Rest extends RouteManager {
     return this
   }
 
-  before(closure) {
+  before(closure) { // beforeHooks
     this.feathers.before(closure)
 
     return this
   }
 
-  before(closure) { // beforeHooks
-    this.feathers._validateServiceBreakpoint()
-    this.feathers._createHooks('before', closure)
-
-    return this
-  }
-
   after(closure) { // afterHooks
-    this.feathers._validateServiceBreakpoint()
-    this.feathers._createHooks('after', closure)
+    this.feathers.after(closure)
 
     return this
   }

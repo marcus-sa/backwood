@@ -27,7 +27,7 @@ module.exports = class Feathers {
 
     this._validateService(Module)
 
-    return new Module(this.app)
+    return this._ioc._makeInstanceOf(Module)
 
     //return this._ioc._makeInstanceOf(this._ioc.use(`${path}/${name}`))
   }

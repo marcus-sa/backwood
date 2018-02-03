@@ -2,7 +2,7 @@
 
 module.exports = class Service {
 
-    constructor(app) {
+    setup(app) {
         this.app = app
     }
 
