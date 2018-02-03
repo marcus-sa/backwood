@@ -77,7 +77,8 @@ module.exports = class FeathersSequelize {
                 this._models[modelName] = sequelizeModel
 
                 this._rest.app.use(model.tableName, service({
-                    Model: sequelizeModel
+                    Model: sequelizeModel,
+                    paginate: model.paginate
                 }))
 
                 return sequelizeModel

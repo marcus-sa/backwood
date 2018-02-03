@@ -4,6 +4,10 @@ const Model = use('Model')
 
 module.exports = class UserModel extends Model {
 
+  static get paginate() {
+    
+  }
+
   static get tableName() {
     return 'users'
   }
