@@ -4,11 +4,14 @@ for people that enjoy FeathersJS but can't stand its way of file and coding stru
 
 **Full docs will come soon**
 
+## Packages
+  * [@backwood/backwood](https://github.com/marcus-sa/backwood/tree/master/src/Feathers)
+  * [@backwood/rest](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Rest)
+  * [@backwood/sequelize](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Sequelize)
+
 ## Installation
 ```bash
-npm install --save backwood-feathers backwood-feathers-rest
-
-yarn add --save backwood-feathers backwood-feathers-rest
+npm install --save @backwood/backwood
 ```
 
 ## Usage
@@ -18,7 +21,7 @@ Okay, start off by creating a new Adonis Project using the CLI:
 adonis new blog
 ```
 
-now navigate to the `server.js` file and replace `.fireHttpServer()` with `.fire()` like so:
+now navigate to the `server.js` file in your root directory and replace `.fireHttpServer()` with `.fire()` like so:
 
 > server.js
 ```
@@ -33,11 +36,9 @@ new Ignitor(require('@adonisjs/fold'))
 
 ```
 
-then it's also recommended to remove most of the providers, as Feathers will be handling everything else
-and add the Backwood providers to the application
+then it's also recommended to remove most of the providers, as Feathers will be handling everything else.
 
 > start/app.js
-
 ```js
 const providers = [
     '@adonisjs/framework/providers/AppProvider',
@@ -56,7 +57,6 @@ const Feathers = use('Feathers')
 
 Feathers
   .service('message', 'MessageService')
-  .service('products', 'ProductService')
 ```
 
 > app/Services/MessageService
@@ -71,7 +71,7 @@ class MessageService extends Service {
   /**
    * Assign hooks to a service
    *
-   * @method hooks
+   * @property hooks
    * @return {Object}
    */
   static get hooks() {
