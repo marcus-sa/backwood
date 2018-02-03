@@ -19,7 +19,7 @@ class MessageService extends Service {
   async get(id, params) {
     console.log(this.config)
     console.log(id, params) // gets logged, but request results in 404?
-    return await Users.findAll()
+    return await Users.getById(1)
   }
 
 }

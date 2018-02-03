@@ -20,9 +20,9 @@ module.exports = class UserModel extends Model {
     }
   }
 
-  static findOneByAccount(id, other = {}) {
+  static getById(id, other = {}) {
     return this.findOne({
-      where: { account_id: id, ...other }
+      where: { id, ...other }
     })
   }
 

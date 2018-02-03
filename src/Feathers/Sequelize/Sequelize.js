@@ -48,28 +48,28 @@ module.exports = class FeathersSequelize {
                 }
 
                 const options = _.mergeWith(model.options, {
-                  instanceMethods: model.prototype,
-                  classMethods: model
+                /*  instanceMethods: model.prototype,
+                  classMethods: Object.getOwnPropertyNames(model).map(method => {
+                    return model[method]
+                  }).filter(method => typeof method === 'function')*/
                 })
+
+                console.log(options)
 
                 const sequelizeModel = this.sequelize.define(
                     model.tableName,
                     model.attributes(Sequelize),
-                    options
+                    model.options
                 )
 
-                Object.keys(model).forEach(prop => {
-                    if (['attributes', 'tableName', 'options'].includes(prop) || typeof prop !== 'string') {
-                      return null
-                    }
-
-                    if (!sequelizeModel.hasOwnProperty(prop)) {
-                        sequelizeModel[prop] = model[prop].bind(sequelizeModel)
-                    }
+                Object.getOwnPropertyNames(model).forEach(prop => {
+                  if (!sequelizeModel.hasOwnProperty(prop) && typeof model[prop] === 'function') {
+                      sequelizeModel[prop] = model[prop].bind(sequelizeModel)
+                  }
                 })
 
-                Object.keys(model.prototype).forEach(prop => {
-                    if (!sequelizeModel.prototype.hasOwnProperty(prop)) {
+                Object.getOwnPropertyNames(model.prototype).forEach(prop => {
+                    if (!sequelizeModel.prototype.hasOwnProperty(prop) && typeof model.prototype[prop] === 'function') {
                         sequelizeModel.prototype[prop] = model.prototype[prop].bind(sequelizeModel.prototype)
                     }
                 })
