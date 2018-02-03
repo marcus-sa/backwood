@@ -4,11 +4,14 @@ for people that enjoy FeathersJS but can't stand its way of file and coding stru
 
 **Full docs will come soon**
 
+## Packages
+  * [@backwood/backwood](https://github.com/marcus-sa/backwood/tree/master/src/Feathers)
+  * [@backwood/rest](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Rest)
+  * [@backwood/sequelize](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Sequelize)
+
 ## Installation
 ```bash
-npm install --save backwood-feathers backwood-feathers-rest
-
-yarn add --save backwood-feathers backwood-feathers-rest
+npm install --save @backwood/backwood @backwood/rest @backwood/sequelize
 ```
 
 ## Usage

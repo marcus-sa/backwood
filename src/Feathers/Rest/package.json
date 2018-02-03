@@ -1,7 +1,7 @@
 {
-  "name": "backwood-feathers-rest",
+  "name": "@backwood/rest",
   "homepage": "https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Rest",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Feathers REST API provider for Adonis",
   "main": "index.js",
   "private": false,

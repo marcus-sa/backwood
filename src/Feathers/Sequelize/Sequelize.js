@@ -25,7 +25,7 @@ module.exports = class FeathersSequelize {
             {
                 dialect,
                 host: connection.host,
-                pool: connection.pool || {},
+                pool: connection.pool,
                 storage: connection.storage
             }
         )

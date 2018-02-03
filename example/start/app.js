@@ -1,6 +1,7 @@
 'use strict'
 
 const path = require('path')
+const feathers = path.resolve(__dirname, '..', '..', 'src', 'Feathers')
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +14,10 @@ const path = require('path')
 |
 */
 exports.providers = [
-  path.join(__dirname, '..', '..', 'src', 'Feathers'),
-  path.join(__dirname, '..', '..', 'src', 'Feathers', 'Sequelize'),
-  path.join(__dirname, '..', '..', 'src', 'Feathers', 'Rest'),
   '@adonisjs/framework/providers/AppProvider',
+  path.join(feathers, 'Sequelize'),
+  path.join(feathers, 'Rest'),
+  feathers,
 ]
 
 /*

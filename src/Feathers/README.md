@@ -40,44 +40,55 @@ and add the Backwood providers to the application
 
 ```js
 const providers = [
-    'backwood-feathers',
-    'backwood-feathers-rest'
+    '@adonisjs/framework/providers/AppProvider',
+    '@backwood/backwood'
 ]
 ```
 
 ### Backwood Feathers
+Create a mandatory file called `feathers.js` in the `start` directory.
+
+> start/feathers.js
 ```js
 'use strict'
-
-const primus = use('@feathersjs/primus')
 
 const Feathers = use('Feathers')
 
 Feathers
-  .configure(primus({ transformer: 'websockets' }))
-  .service('message', 'MessageService').hooks('MessageHooks')
-  .service('products', 'ProductService').hooks('ProductService')
+  .service('message', 'MessageService')
+  .service('products', 'ProductService')
 ```
 
-### Backwood Feathers REST API
+> app/Services/MessageService
 ```js
 'use strict'
 
-const Rest = use('Rest')
+const Service = use('Service')
+const Messages = use('Models/Messages')
 
-exports.globalMiddleware = [
-  Rest.express.json()
-]
+class MessageService extends Service {
 
-exports.namedMiddleware = {
-  test: (req, res, next) => {
-    console.log('test')
-    next()
+  /**
+   * Assign hooks to a service
+   *
+   * @method hooks
+   * @return {Object}
+   */
+  static get hooks() {
+    return {
+      before: {
+        get: (ctx) => {
+          // Define get hook
+        }
+      }
+    }
   }
+
+  get(id, params) {
+    return Messages.findById(id)
+  }
+
 }
 
-Rest
-  .group(() => {
-    Rest.get('/test', 'TestController.get')
-  }).middleware('test')
+module.exports = MessageService
 ```
