@@ -1,7 +1,7 @@
 {
-  "name": "backwood-feathers",
+  "name": "@backwood/backwood",
   "homepage": "https://github.com/marcus-sa/backwood",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Feathers provider for Adonis",
   "main": "index.js",
   "private": false,

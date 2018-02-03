@@ -23,11 +23,11 @@ module.exports = class Feathers {
   }
 
   _createService(name) {
-    const Service = this._ioc.use(`${this._servicesPath}/${name}`)
+    const service = this._ioc.use(`${this._servicesPath}/${name}`)
 
-    this._validateService(Service)
+    this._validateService(service)
 
-    return this._ioc._makeInstanceOf(Service)
+    return this._ioc._makeInstanceOf(service)
   }
 
   _validateService(Module) {
@@ -51,20 +51,14 @@ module.exports = class Feathers {
         const { closure } = this._services[serviceName]
 
         const service = typeof closure === 'string'
-          ? this._createService(closure, dependencies)
+          ? this._createService(closure)
           : closure
 
-        if (service.hooks) {
-          this.app.service(serviceName).hooks(service.hooks)
-        }
+        this.app.service(serviceName).hooks(service.hooks || {})
       })
 
     this.app.listen(this._config.port)
     console.log('Feathers App is listening on port:', this._config.port)
-  }
-
-  addResolver(handler) {
-    this._resolvers.push(handler)
   }
 
   service(name, closure, express = false) {
@@ -100,7 +94,7 @@ module.exports = class Feathers {
     return this
   }
 
-  before(closure) { // beforeHooks
+  before(closure) {
     this._validateServiceBreakpoint()
 
     this._createHooks('before', closure)
@@ -108,7 +102,7 @@ module.exports = class Feathers {
     return this
   }
 
-  after(closure) { // afterHooks
+  after(closure) {
     this._validateServiceBreakpoint()
 
     this._createHooks('after', closure)

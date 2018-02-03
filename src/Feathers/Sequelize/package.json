@@ -1,7 +1,7 @@
 {
-  "name": "backwood-feathers-sequelize",
+  "name": "@backwood/sequelize",
   "homepage": "https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Sequelize",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Feathers Sequelize ORM provider for Adonis",
   "main": "index.js",
   "private": false,

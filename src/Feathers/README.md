@@ -4,11 +4,14 @@ for people that enjoy FeathersJS but can't stand its way of file and coding stru
 
 **Full docs will come soon**
 
+## Packages
+  * [@backwood/backwood](https://github.com/marcus-sa/backwood/tree/master/src/Feathers)
+  * [@backwood/rest](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Rest)
+  * [@backwood/sequelize](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Sequelize)
+
 ## Installation
 ```bash
-npm install --save backwood-feathers backwood-feathers-rest
-
-yarn add --save backwood-feathers backwood-feathers-rest
+npm install --save @backwood/backwood
 ```
 
 ## Usage
@@ -18,7 +21,7 @@ Okay, start off by creating a new Adonis Project using the CLI:
 adonis new blog
 ```
 
-now navigate to the `server.js` file and replace `.fireHttpServer()` with `.fire()` like so:
+now navigate to the `server.js` file in your root directory and replace `.fireHttpServer()` with `.fire()` like so:
 
 > server.js
 ```
@@ -33,51 +36,59 @@ new Ignitor(require('@adonisjs/fold'))
 
 ```
 
-then it's also recommended to remove most of the providers, as Feathers will be handling everything else
-and add the Backwood providers to the application
+then it's also recommended to remove most of the providers, as Feathers will be handling everything else.
 
 > start/app.js
-
 ```js
 const providers = [
-    'backwood-feathers',
-    'backwood-feathers-rest'
+    '@adonisjs/framework/providers/AppProvider',
+    '@backwood/backwood'
 ]
 ```
 
 ### Backwood Feathers
+Create a mandatory file called `feathers.js` in the `start` directory.
+
+> start/feathers.js
 ```js
 'use strict'
-
-const primus = use('@feathersjs/primus')
 
 const Feathers = use('Feathers')
 
 Feathers
-  .configure(primus({ transformer: 'websockets' }))
-  .service('message', 'MessageService').hooks('MessageHooks')
-  .service('products', 'ProductService').hooks('ProductService')
+  .service('message', 'MessageService')
 ```
 
-### Backwood Feathers REST API
+> app/Services/MessageService
 ```js
 'use strict'
 
-const Rest = use('Rest')
+const Service = use('Service')
+const Messages = use('Models/Messages')
 
-exports.globalMiddleware = [
-  Rest.express.json()
-]
+class MessageService extends Service {
 
-exports.namedMiddleware = {
-  test: (req, res, next) => {
-    console.log('test')
-    next()
+  /**
+   * Assign hooks to a service
+   *
+   * @property hooks
+   * @return {Object}
+   */
+  static get hooks() {
+    return {
+      before: {
+        get: (ctx) => {
+          // Define get hook
+        }
+      }
+    }
   }
+
+  get(id, params) {
+    return Messages.findById(id)
+  }
+
 }
 
-Rest
-  .group(() => {
-    Rest.get('/test', 'TestController.get')
-  }).middleware('test')
+module.exports = MessageService
 ```
