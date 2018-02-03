@@ -1,8 +1,8 @@
 {
-  "name": "backwood-feathers-rest",
-  "homepage": "https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Rest",
-  "version": "1.0.0",
-  "description": "Feathers REST API provider for Adonis",
+  "name": "backwood-feathers-sequelize",
+  "homepage": "https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Sequelize",
+  "version": "1.0.1",
+  "description": "Feathers Sequelize ORM provider for Adonis",
   "main": "index.js",
   "private": false,
   "scripts": {
@@ -13,9 +13,9 @@
     "url": "git+https://github.com/marcus-sa/backwood.git"
   },
   "dependencies": {
-    "lodash": "*",
-    "@adonisjs/fold": "*",
-    "@feathersjs/express": "*"
+    "feathers-sequelize": "*",
+    "sequelize": "*",
+    "lodash": "*"
   },
   "author": "Marcus S. Abildskov",
   "license": "MIT"

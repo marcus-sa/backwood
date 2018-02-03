@@ -1,5 +1,7 @@
 'use strict'
 
+const _ = require('lodash')
+const BaseModel = require('./Model')
 const path = require('path')
 const Sequelize = require('sequelize')
 const service = require('feathers-sequelize')
@@ -12,60 +14,76 @@ module.exports = class FeathersSequelize {
         this._helpers = Helpers
         const config = Config.get('database')
         const dialect = config.connection
-        const database = config[dialect]
+        const { connection } = config[dialect]
 
         this._modelsPath = 'App/Models'
 
         this.sequelize = new Sequelize(
-            database.database || '',
-            database.username || '',
-            database.password || '',
+            connection.database,
+            connection.user,
+            connection.password,
             {
-                dialect: database.client,
-                host: database.host,
-                pool: database.pool || {},
-                storage: database.storage
+                dialect,
+                host: connection.host,
+                pool: connection.pool || {},
+                storage: connection.storage
             }
         )
 
+        console.log(connection)
+
         this._models = {}
-        this._start()
     }
 
     _start() {
+      console.log('Sequelize')
         const { models } = require(path.join(this._helpers.appRoot(), 'start', 'app.js'))
 
         Object.keys(models).forEach(modelName => {
-            this._ioc.singleton(`Model/${modelName}`, (ioc) => {
-                const Model = this._ioc.use(models[modelName])
+            this._ioc.singleton(`Feathers/Models/${modelName}`, (ioc) => {
+                const model = this._ioc.use(models[modelName])
+
+                if (model.prototype instanceof BaseModel === false) {
+                  throw new Error(`${model.name} model must extend base model class`)
+                }
+
+                const options = _.mergeWith(model.options, {
+                  instanceMethods: model.prototype,
+                  classMethods: model
+                })
+
                 const sequelizeModel = this.sequelize.define(
-                    Model.tableName,
-                    Model.attributes(Sequelize),
-                    Model.options || {}
+                    model.tableName,
+                    model.attributes(Sequelize),
+                    options
                 )
 
-                const modelInstance = new Model()
+                Object.keys(model).forEach(prop => {
+                    if (['attributes', 'tableName', 'options'].includes(prop) || typeof prop !== 'string') {
+                      return null
+                    }
 
-                Object.keys(Model).forEach(prop => {
                     if (!sequelizeModel.hasOwnProperty(prop)) {
-                        sequelizeModel[prop] = Model[prop].bind(sequelizeModel)
+                        sequelizeModel[prop] = model[prop].bind(sequelizeModel)
                     }
                 })
 
-                Object.keys(modelInstance).forEach(prop => {
+                Object.keys(model.prototype).forEach(prop => {
                     if (!sequelizeModel.prototype.hasOwnProperty(prop)) {
-                        sequelizeModel.prototype[prop] = modelInstance[prop].bind(sequelizeModel.prototype)
+                        sequelizeModel.prototype[prop] = model.prototype[prop].bind(sequelizeModel.prototype)
                     }
                 })
 
                 this._models[modelName] = sequelizeModel
 
-                this._rest.app.use(Model.tableName, service({
+                this._rest.app.use(model.tableName, service({
                     Model: sequelizeModel
                 }))
 
                 return sequelizeModel
             })
+
+            this._ioc.alias(`Feathers/Models/${modelName}`, modelName)
         })
     }
 

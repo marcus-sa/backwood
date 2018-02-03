@@ -3,7 +3,7 @@
 const { ServiceProvider } = require('@adonisjs/fold')
 
 const SEQUELIZE = 'Backwood/Feathers/Sequelize'
-const MODEL = `${SEQUELIZE}/Model`
+const MODEL = `Backwood/Feathers/Model`
 
 class FeathersSequelizeProvider extends ServiceProvider {
 
@@ -14,18 +14,18 @@ class FeathersSequelizeProvider extends ServiceProvider {
         this.app.alias(MODEL, 'Model')
 
         this.app.singleton(SEQUELIZE, (app) => {
-            const Sequelize = require('./Sequelize')
+          const Sequelize = require('./Sequelize')
 
-            const Rest = app.use('Rest')
-            const Config = app.use('Config')
-            const Helpers = app.use('Helpers')
+          const Rest = this.app.use('Rest')
+          const Config = this.app.use('Config')
+          const Helpers = this.app.use('Helpers')
 
-            return new Sequelize(Rest, app, Config, Helpers)
+          return new Sequelize(Rest, app, Config, Helpers)
         })
     }
 
     boot() {
-        console.log(this.app.use(SEQUELIZE)._models)
+      this.app.use(SEQUELIZE)._start()
     }
 
 }

@@ -57,14 +57,14 @@ module.exports = class Rest extends RouteManager {
 
       const slashes = route.route[0] === '/' ? '' : '/'
       const path = route.prefix.join('/') + slashes + route.route
-      const middleware = [globalMiddleware, route.middleware.map(
-          (name) => namedMiddleware[name]
-      )]
 
       if (route.method === 'service') {
-        const service = this.feathers.getServices(route.route)
+        const { closure } = this.feathers.getServices(route.route)
+        const service = typeof closure === 'string'
+          ? this.feathers._createService(closure)
+          : closure
 
-        this.app.use(path, service.closure)//...middleware.concat(service.closure))
+        this.app.use(path, service)//...middleware.concat(service.closure))
 
         if (service.hooks) {
           this.app.service(path).hooks(service.hooks)
@@ -73,9 +73,15 @@ module.exports = class Rest extends RouteManager {
         return null
       }
 
+      const middleware = route.middleware.map(
+          (name) => namedMiddleware[name]
+      ).concat(globalMiddleware)
+
       if (typeof route.handler === 'string') {
           route.handler = this._createHandler(this._controllersPath, ...route.namespace, route.handler)
       }
+
+      console.log(path, route.method)
 
       this.app[route.method](path, ...middleware.concat(route.handler))
     })
@@ -87,7 +93,15 @@ module.exports = class Rest extends RouteManager {
   service(name, closure) {
     this.feathers.service(name, closure, true)
 
+    //console.log(this.feathers.service(name))
+
     this.route('service', name, closure)
+
+    return this
+  }
+
+  dependencies(dependencies) {
+    this.feathers.dependencies(dependencies)
 
     return this
   }

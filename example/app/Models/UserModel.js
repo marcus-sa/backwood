@@ -1,6 +1,8 @@
 'use strict'
 
-module.exports = class UserModel {
+const Model = use('Model')
+
+module.exports = class UserModel extends Model {
 
   static get tableName() {
     return 'users'
