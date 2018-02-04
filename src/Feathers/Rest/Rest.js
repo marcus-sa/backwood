@@ -65,7 +65,10 @@ module.exports = class Rest extends RouteManager {
           : closure
 
         this.app.use(path, service).hooks(service.hooks || {})
-        //this.app.service(path).hooks(service.hooks || {})
+
+        /*this._ioc.singleton(`Services/${service.serviceName || path}`, () => {
+          return this.app.service(path)
+        })*/
 
         return null
       }

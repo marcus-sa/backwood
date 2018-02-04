@@ -1,7 +1,6 @@
 'use strict'
 
 const Service = use('Service')
-const Users = use('Users')
 
 class MessageService extends Service {
 
@@ -16,8 +15,8 @@ class MessageService extends Service {
 
   }
 
-  get(id, params) {
-    return Users.getById(id)
+  async get(id, params) {
+    return 'kek'
   }
 
 }

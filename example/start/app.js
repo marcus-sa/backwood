@@ -57,7 +57,14 @@ exports.aliases = {}
 */
 exports.commands = []
 
-
+/*
+|--------------------------------------------------------------------------
+| Models
+|--------------------------------------------------------------------------
+|
+| Here you define your Feathers Sequelize models
+|
+*/
 exports.models = {
-  Users: 'App/Models/UserModel'
+  Users: 'App/Models/Users'
 }
