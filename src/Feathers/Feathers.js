@@ -1,7 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
-const path = require('path')
+const pascalCase = require('pascal-case')
 const feathers = require('@feathersjs/feathers')
 
 const Service = require('./Service')
@@ -43,10 +43,10 @@ module.exports = class Feathers {
   }
 
   _start(adonis) {
-    this._start = require(path.join(this._helpers.appRoot(), 'start', 'feathers.js'))
+    this._start = require(this._helpers.appRoot('start/feathers.js'))
 
     Object.keys(this._services)
-      .filter(service => !service.express)
+      .filter(service => service.express)
       .forEach(serviceName => {
         const { closure } = this._services[serviceName]
 
@@ -54,13 +54,33 @@ module.exports = class Feathers {
           ? this._createService(closure)
           : closure
 
-        this.app.service(serviceName).hooks(service.hooks || {})
+        this.app.use(serviceName, service).hooks(service.hooks || {})
+
+        if (typeof service.boot === 'function') {
+          service.boot.bind(this.app.service(path))()
+        }
+
+        this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
+          return this.app.service(serviceName)
+        })
       })
 
     this.app.listen(this._config.port)
     console.log('Feathers App is listening on port:', this._config.port)
   }
 
+  /**
+   * Create a Feathers service
+   *
+   * @method service
+   *
+   * @param {String} name
+   * @param {String | Object} closure
+   * @param {Boolean: false} express
+   *
+   * @return {Service}
+   * @chainable
+   */
   service(name, closure, express = false) {
     if (!closure) {
       if (!this._services[name]) {

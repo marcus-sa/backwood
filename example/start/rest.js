@@ -18,5 +18,5 @@ exports.namedMiddleware = {
 //Rest
   //.group(() => {
     Rest.get('test', 'TestController.get')
-    Rest.service('message', 'MessageService')// .dependencies(['Model/User'])
+    Rest.service('user', 'UserService')// .dependencies(['Model/User'])
   //}).middleware('test')

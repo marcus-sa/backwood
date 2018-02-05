@@ -30,7 +30,7 @@ exports.providers = [
 |
 */
 exports.aceProviders = [
-  '@adonisjs/lucid/providers/MigrationsProvider'
+  //'@adonisjs/lucid/providers/MigrationsProvider'
 ]
 
 /*
@@ -55,9 +55,19 @@ exports.aliases = {}
 | Here you store ace commands for your package
 |
 */
-exports.commands = []
+exports.commands = [
+  path.join(feathers, 'Commands.js'),
+  path.join(feathers, 'Sequelize', 'Commands.js')
+]
 
-
+/*
+|--------------------------------------------------------------------------
+| Models
+|--------------------------------------------------------------------------
+|
+| Here you define your Feathers Sequelize models
+|
+*/
 exports.models = {
-  Users: 'App/Models/UserModel'
+  Users: 'App/Models/Users'
 }
