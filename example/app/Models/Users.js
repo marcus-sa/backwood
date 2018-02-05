@@ -88,6 +88,7 @@ module.exports = class UserModel extends Model {
    *
    * @property serviceHooks
    * @static
+   * @optional
    * @type {Object}
    */
   static get serviceHooks() {
@@ -98,6 +99,7 @@ module.exports = class UserModel extends Model {
   * Define hooks for the Sequelize Model
   *
   * @property hooks
+  * @optional
   * @static
   * @type {Object}
   */

@@ -15,7 +15,8 @@
   "dependencies": {
     "lodash": "*",
     "@adonisjs/fold": "*",
-    "@feathersjs/express": "*"
+    "@feathersjs/express": "*",
+    "pascal-case": "*"
   },
   "author": "Marcus S. Abildskov",
   "license": "MIT"

@@ -1,7 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
-const path = require('path')
+const pascalCase = require('pascal-case')
 const express = require('@feathersjs/express')
 
 const RouteManager = require('./Route/Manager')
@@ -11,7 +11,7 @@ module.exports = class Rest extends RouteManager {
   constructor(Ioc, Feathers, Config, Env, Helpers) {
     super()
 
-    this._config = Config.get('feathers.express', { port: 3031 })
+    this._config = Config.get('feathers.express', { port: 3000 })
     this._env = Env.get('NODE_ENV')
     this._helpers = Helpers
     this._controllersPath = 'App/Controllers'
@@ -19,7 +19,7 @@ module.exports = class Rest extends RouteManager {
     this._ioc = Ioc
     this.express = express
     this.feathers = Feathers
-    this.app = express(Feathers.app)//express(Feathers.app)
+    this.app = express(Feathers.app)
   }
 
   _createNamedMiddleware(namedMiddleware = {}) {
@@ -45,7 +45,7 @@ module.exports = class Rest extends RouteManager {
   }
 
   _start(options) {
-    const start = require(path.join(this._helpers.appRoot(), 'start', 'rest.js'))
+    const start = require(this._helpers.appRoot('start/rest.js'))
     this.app.configure(express.rest())
 
     const globalMiddleware = this._createGlobalMiddleware(start.globalMiddleware)
@@ -66,9 +66,13 @@ module.exports = class Rest extends RouteManager {
 
         this.app.use(path, service).hooks(service.hooks || {})
 
-        /*this._ioc.singleton(`Services/${service.serviceName || path}`, () => {
+        if (typeof service.boot === 'function') {
+          service.boot.bind(this.app.service(path))()
+        }
+
+        this._ioc.singleton(`Services/${pascalCase(service.serviceName || path)}`, () => {
           return this.app.service(path)
-        })*/
+        })
 
         return null
       }
@@ -91,15 +95,7 @@ module.exports = class Rest extends RouteManager {
   service(name, closure) {
     this.feathers.service(name, closure, true)
 
-    //console.log(this.feathers.service(name))
-
     this.route('service', name, closure)
-
-    return this
-  }
-
-  dependencies(dependencies) {
-    this.feathers.dependencies(dependencies)
 
     return this
   }

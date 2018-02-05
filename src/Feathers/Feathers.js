@@ -1,7 +1,7 @@
 'use strict'
 
 const _ = require('lodash')
-const path = require('path')
+const pascalCase = require('pascal-case')
 const feathers = require('@feathersjs/feathers')
 
 const Service = require('./Service')
@@ -43,7 +43,7 @@ module.exports = class Feathers {
   }
 
   _start(adonis) {
-    this._start = require(path.join(this._helpers.appRoot(), 'start', 'feathers.js'))
+    this._start = require(this._helpers.appRoot('start/feathers.js'))
 
     Object.keys(this._services)
       .filter(service => service.express)
@@ -56,9 +56,13 @@ module.exports = class Feathers {
 
         this.app.use(serviceName, service).hooks(service.hooks || {})
 
-        /*this._ioc.singleton(`Services/${serviceName}`, () => {
+        if (typeof service.boot === 'function') {
+          service.boot.bind(this.app.service(path))()
+        }
+
+        this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
           return this.app.service(serviceName)
-        })*/
+        })
       })
 
     this.app.listen(this._config.port)

@@ -2,7 +2,7 @@
 
 const _ = require('lodash')
 const BaseModel = require('./Model')
-const path = require('path')
+const pascalCase = require('pascal-case')
 const Sequelize = require('sequelize')
 
 module.exports = class FeathersSequelize {
@@ -35,33 +35,11 @@ module.exports = class FeathersSequelize {
     }
 
     _start() {
-        const { models } = require(path.join(this._helpers.appRoot(), 'start', 'app.js'))
+        const { models } = require(this._helpers.appRoot('start/app.js'))
 
         Object.keys(models).forEach(modelName => {
             this._ioc.singleton(`Models/${modelName}`, (ioc) => {
                 const model = this._ioc.use(models[modelName])
-
-                /*if (process.env.NODE_ENV !== 'production') {
-                  const Joi = require('joi')
-
-                  const schema = Joi.object().keys({
-                    id: Joi.string(),
-                    name: Joi.string().required(),
-                    tableName: Joi.string().required(),
-                    hooks: Joi.any(), // must be object or function
-                    serviceHooks: Joi.object(),
-                    options: Joi.object(),
-                    attributes: Joi.func().required(),
-                    paginate: Joi.object()
-                    raw: Joi.bool(),
-                    events: Joi.array(),
-                    prototype: Joi.object()
-                  })
-
-                  const { error } = Joi.validate(model, schema)
-
-                  if (error) throw new Error(error)
-                }*/
 
                 if (model.prototype instanceof BaseModel === false) {
                   throw new Error(`${model.name} model must extend base model class`)
@@ -80,7 +58,7 @@ module.exports = class FeathersSequelize {
                 )
 
                 if (typeof model.hooks === 'function') {
-                  model.hooks(sequelizeModel)
+                  model.hooks.bind(sequelizeModel)()
                 }
 
                 //_.unset(model, ['attributes', 'hooks', 'name'])
@@ -99,7 +77,7 @@ module.exports = class FeathersSequelize {
 
                 this._models[modelName] = sequelizeModel
 
-                if (typeof model.createService === 'undefined' || model.createService) {
+                if (typeof model.createService === 'undefined' || model.createService || model.serviceName) {
                   const service = require('feathers-sequelize')
                   const serviceName = model.serviceName || model.tableName
 
@@ -110,6 +88,10 @@ module.exports = class FeathersSequelize {
                       raw: model.raw,
                       paginate: model.paginate
                   })).hooks(model.serviceHooks || {})
+
+                  this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
+                    return this._rest.app.service(serviceName)
+                  })
                 }
 
                 return sequelizeModel

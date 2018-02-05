@@ -1,19 +1,33 @@
-
+## Installation
+```bash
+npm install --save @backwood/backwood @backwood/rest @backwood/sequelize
+```
 
 ## Packages
   * [@backwood/backwood](https://github.com/marcus-sa/backwood/tree/master/src/Feathers)
   * [@backwood/rest](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Rest)
   * [@backwood/sequelize](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Sequelize)
 
-
 ## Model Usage
+Start by exporting a `providers` array in your `start/app.js` file
+```js
+...
+
+exports.providers = [
+  '@backwood/sequelize',
+  '@backwood/rest',
+  '@backwood/backwood'
+]
+```
+
+> app/Models/Users
 ```js
 'use strict'
 
 const bcrypt = use('bcryptjs')
 const Model = use('Model')
 
-module.exports = class UserModel extends Model {
+module.exports = class Users extends Model {
 
   /**
    * Whether or not a service

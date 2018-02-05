@@ -15,7 +15,8 @@
   "dependencies": {
     "feathers-sequelize": "*",
     "sequelize": "*",
-    "lodash": "*"
+    "lodash": "*",
+    "pascal-case": "*"
   },
   "author": "Marcus S. Abildskov",
   "license": "MIT"

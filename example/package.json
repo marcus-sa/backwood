@@ -5,6 +5,7 @@
   "description": "Adonis Feathers provider",
   "main": "index.js",
   "scripts": {
+    "ace": "better-npm-run fire:ace",
     "dev": "better-npm-run serve:dev",
     "start": "node server.js",
     "test": "node ace test"
@@ -12,6 +13,13 @@
   "betterScripts": {
     "serve:dev": {
       "command": "nodemon -w ../src -w providers -w start -w app -w config -w database -i public -x node --trace-warnings server.js",
+      "env": {
+        "NODE_PATH": "./node_modules",
+        "NODE_ENV": "development"
+      }
+    },
+    "fire:ace": {
+      "command": "node --trace-warnings ace",
       "env": {
         "NODE_PATH": "./node_modules",
         "NODE_ENV": "development"
@@ -39,8 +47,9 @@
     "sequelize": "^4.32.3"
   },
   "devDependencies": {
-    "ws": "^4.0.0",
-    "nodemon": "^1.14.11"
+    "nodemon": "^1.14.11",
+    "pascal-case": "^2.0.1",
+    "ws": "^4.0.0"
   },
   "autoload": {
     "App": "./app"
