@@ -7,7 +7,7 @@ const MODEL = `Backwood/Feathers/Model`
 
 class FeathersSequelizeProvider extends ServiceProvider {
 
-    register() {
+    async register() {
         this.app.singleton(MODEL, (app) => {
             return require('./Model')
         })
@@ -24,7 +24,7 @@ class FeathersSequelizeProvider extends ServiceProvider {
         })
     }
 
-    boot() {
+    async boot() {
       this.app.use(SEQUELIZE)._start()
     }
 

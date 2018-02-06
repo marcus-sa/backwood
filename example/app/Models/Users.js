@@ -15,7 +15,7 @@ module.exports = class UserModel extends Model {
    * @type {Boolean}
    */
    static get createService() {
-     return false
+     return true
    }
 
   /**

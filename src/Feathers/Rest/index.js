@@ -6,7 +6,7 @@ const NAMESPACE = 'Backwood/Rest'
 
 class FeathersRestProvider extends ServiceProvider {
 
-  register() {
+  async register() {
     this.app.singleton(NAMESPACE, (app) => {
       const Rest = require('./Rest')
 
@@ -22,7 +22,7 @@ class FeathersRestProvider extends ServiceProvider {
   }
 
 
-  boot() {
+  async boot() {
     this.app.use(NAMESPACE)._start()
   }
 

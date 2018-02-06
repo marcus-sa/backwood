@@ -11,12 +11,7 @@ const Server = use('Server')
 | match.
 |
 */
-const globalMiddleware = [
-  'Adonis/Middleware/BodyParser',
-  'Adonis/Middleware/Session',
-  'Adonis/Middleware/Shield',
-  'Adonis/Middleware/AuthInit'
-]
+const globalMiddleware = []
 
 /*
 |--------------------------------------------------------------------------
