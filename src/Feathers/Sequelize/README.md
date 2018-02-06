@@ -9,15 +9,22 @@ npm install --save @backwood/backwood @backwood/rest @backwood/sequelize
   * [@backwood/sequelize](https://github.com/marcus-sa/backwood/tree/master/src/Feathers/Sequelize)
 
 ## Model Usage
-Start by exporting a `providers` array in your `start/app.js` file
+Start by adding the provider to the `providers` array in your `start/app.js` file
 ```js
 ...
 
 exports.providers = [
-  '@backwood/sequelize',
+  '@backwood/sequelize', // <-- must be added before the rest of the Backwood providers
   '@backwood/rest',
   '@backwood/backwood'
 ]
+```
+
+Now export an object named `models` in the same file
+```js
+exports.models = {
+  Users: 'App/Models/Users'
+}
 ```
 
 > app/Models/Users

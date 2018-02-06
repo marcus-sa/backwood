@@ -6,7 +6,7 @@ const NAMESPACE = 'Backwood/Feathers'
 
 class FeathersProvider extends ServiceProvider {
 
-  register() {
+  async register() {
     this.app.singleton(NAMESPACE, (app) => {
       const Feathers = require('./Feathers')
 
@@ -22,7 +22,7 @@ class FeathersProvider extends ServiceProvider {
     this.app.alias(`${NAMESPACE}/Service`, 'Service')
   }
 
-  boot() {
+  async boot() {
     this.app.use(NAMESPACE)._start(this.app)
   }
 
