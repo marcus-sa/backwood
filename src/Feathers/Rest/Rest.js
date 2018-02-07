@@ -17,6 +17,7 @@ module.exports = class Rest extends RouteManager {
     this._controllersPath = 'App/Controllers'
 
     this._ioc = Ioc
+    this._services = []
     this.express = express
     this.feathers = Feathers
     this.app = express(Feathers.app)
@@ -45,8 +46,9 @@ module.exports = class Rest extends RouteManager {
   }
 
   _start(options) {
+    const { app } = this
     const start = require(this._helpers.appRoot('start/rest.js'))
-    this.app.configure(express.rest())
+    app.configure(express.rest())
 
     const globalMiddleware = this._createGlobalMiddleware(start.globalMiddleware)
     const namedMiddleware = this._createNamedMiddleware(start.namedMiddleware)
@@ -60,19 +62,8 @@ module.exports = class Rest extends RouteManager {
 
       if (route.method === 'service') {
         const { closure } = this.feathers.getServices(route.route)
-        const service = typeof closure === 'string'
-          ? this.feathers._createService(closure)
-          : closure
 
-        this.app.use(path, service).hooks(service.hooks || {})
-
-        if (typeof service.boot === 'function') {
-          service.boot.bind(this.app.service(path))()
-        }
-
-        this._ioc.singleton(`Services/${pascalCase(service.serviceName || path)}`, () => {
-          return this.app.service(path)
-        })
+        this.feathers._createService(closure, path, this.app)
 
         return null
       }
@@ -90,6 +81,18 @@ module.exports = class Rest extends RouteManager {
 
     this.app.listen(this._config.port)
     console.info('Feathers REST API is listening on port:', this._config.port)
+  }
+
+  use(middleware) {
+    this.app.use(middleware)
+
+    return this
+  }
+
+  configure(middleware) {
+    this.app.configure(middleware)
+
+    return this
   }
 
   service(name, closure) {

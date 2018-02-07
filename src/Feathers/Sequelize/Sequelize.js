@@ -45,7 +45,7 @@ module.exports = class FeathersSequelize {
             }
 
             const options = _.mergeWith(model.options, {
-              hooks: typeof model.hooks === 'object'
+              hooks: model.hooks instanceof Object
                 ? model.hooks
                 : {}
             })
@@ -56,18 +56,18 @@ module.exports = class FeathersSequelize {
                 options
             )
 
-            if (typeof model.hooks === 'function') {
+            if (model.hooks instanceof Function) {
               model.hooks.bind(sequelizeModel)()
             }
 
             Object.getOwnPropertyNames(model).forEach(prop => {
-              if (!sequelizeModel.hasOwnProperty(prop) && typeof model[prop] === 'function') {
+              if (!sequelizeModel.hasOwnProperty(prop) && model[prop] instanceof Function) {
                   sequelizeModel[prop] = model[prop].bind(sequelizeModel)
               }
             })
 
             Object.getOwnPropertyNames(model.prototype).forEach(prop => {
-                if (!sequelizeModel.prototype.hasOwnProperty(prop) && typeof model.prototype[prop] === 'function') {
+                if (!sequelizeModel.prototype.hasOwnProperty(prop) && model.prototype[prop] instanceof Function) {
                     sequelizeModel.prototype[prop] = model.prototype[prop].bind(sequelizeModel.prototype)
                 }
             })
@@ -85,6 +85,10 @@ module.exports = class FeathersSequelize {
                 raw: model.raw,
                 paginate: model.paginate
               })).hooks(model.serviceHooks || {})
+
+              if (model.serviceHooks instanceof Object) {
+                this._rest.app.service(serviceName).hooks(model.serviceHooks)
+              }
 
               this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
                 return this._rest.app.service(serviceName)
