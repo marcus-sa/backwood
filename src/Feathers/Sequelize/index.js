@@ -8,17 +8,15 @@ const MODEL = `Backwood/Feathers/Model`
 class FeathersSequelizeProvider extends ServiceProvider {
 
     async register() {
-        this.app.singleton(MODEL, (app) => {
-            return require('./Model')
-        })
+        this.app.singleton(MODEL, () => require('./Model'))
         this.app.alias(MODEL, 'Model')
 
         this.app.singleton(SEQUELIZE, (app) => {
           const Sequelize = require('./Sequelize')
 
-          const Rest = this.app.use('Rest')
-          const Config = this.app.use('Config')
-          const Helpers = this.app.use('Helpers')
+          const Rest = app.use('Rest')
+          const Config = app.use('Config')
+          const Helpers = app.use('Helpers')
 
           return new Sequelize(Rest, app, Config, Helpers)
         })

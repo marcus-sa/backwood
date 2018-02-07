@@ -22,12 +22,42 @@ module.exports = class Feathers {
     this.app = feathers()
   }
 
-  _createService(name) {
-    const service = this._ioc.use(`${this._servicesPath}/${name}`)
+  _createService(namespace, serviceName, app = this.app) {
+    const service = this._ioc.use(`${this._servicesPath}/${namespace}`)
 
     this._validateService(service)
 
-    return this._ioc._makeInstanceOf(service)
+    const serviceInstance = this._ioc._makeInstanceOf(service)
+
+    app.configure(function () {
+      // since feathers doesnt support services
+      // without any methods we gotta create noops
+      const mergedService = _.merge({
+        get: () => {},
+        create: () => {},
+        patch: () => {},
+        update: () => {},
+        delete: () => {}
+      }, serviceInstance)
+
+      this.use(serviceName, mergedService)
+
+      if (Array.isArray(mergedService.configure)) {
+        mergedService.configure.forEach(middleware => this.configure(middleware))
+      }
+
+      this.service(serviceName).hooks(mergedService.hooks || {})
+    })
+
+    if (serviceInstance.boot instanceof Function) {
+      serviceInstance.boot.bind(app.service(serviceName))()
+    }
+
+    this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
+      return this.app.service(serviceName)
+    })
+
+    return serviceInstance
   }
 
   _validateService(Module) {
@@ -50,19 +80,7 @@ module.exports = class Feathers {
       .forEach(serviceName => {
         const { closure } = this._services[serviceName]
 
-        const service = typeof closure === 'string'
-          ? this._createService(closure)
-          : closure
-
-        this.app.use(serviceName, service).hooks(service.hooks || {})
-
-        if (typeof service.boot === 'function') {
-          service.boot.bind(this.app.service(path))()
-        }
-
-        this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
-          return this.app.service(serviceName)
-        })
+        this._createService(closure, serviceName)
       })
 
     this.app.listen(this._config.port)
