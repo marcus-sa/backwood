@@ -86,10 +86,6 @@ module.exports = class FeathersSequelize {
                 paginate: model.paginate
               })).hooks(model.serviceHooks || {})
 
-              if (model.serviceHooks instanceof Object) {
-                this._rest.app.service(serviceName).hooks(model.serviceHooks)
-              }
-
               this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
                 return this._rest.app.service(serviceName)
               })

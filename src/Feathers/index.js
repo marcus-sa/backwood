@@ -20,6 +20,9 @@ class FeathersProvider extends ServiceProvider {
 
     this.app.singleton(`${NAMESPACE}/Service`, () => require('./Service'))
     this.app.alias(`${NAMESPACE}/Service`, 'Service')
+
+    this.app.singleton(`${NAMESPACE}/Validation`, () => require('./Validation'))
+    this.app.alias(`${NAMESPACE}/Validation`, 'Validation')
   }
 
   async boot() {
