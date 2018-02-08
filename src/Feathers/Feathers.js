@@ -83,7 +83,10 @@ module.exports = class Feathers {
         this._createService(closure, serviceName)
       })
 
-    this.app.listen(this._config.port)
+    if (Object.keys(this._servies).length) {
+      this.app.listen(this._config.port)
+    }
+
     console.log('Feathers App is listening on port:', this._config.port)
   }
 
