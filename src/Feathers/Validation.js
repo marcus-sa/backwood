@@ -2,7 +2,6 @@
 
 const errors = require('@feathersjs/errors')
 const validator = require('validator')
-const validation = require('../src/utils/validation')
 
 const isEmpty = (value) => value === undefined || value === null || value === ''
 const join = (rules) => (value, data, params) => rules.map(rule => rule(value, data, params)).filter(error => !!error)[0]
