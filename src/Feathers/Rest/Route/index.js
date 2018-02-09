@@ -26,7 +26,7 @@ module.exports = class Route {
   }
 
   _validateRoute(route) {
-    if (typeof route !== 'string') {
+    if (typeof route === 'undefined') {
       throw new Error('Cannot instantiate route without a valid url string')
     }
   }

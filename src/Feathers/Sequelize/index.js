@@ -20,6 +20,8 @@ class FeathersSequelizeProvider extends ServiceProvider {
 
           return new Sequelize(Rest, app, Config, Helpers)
         })
+
+        this.app.alias(SEQUELIZE, 'Sequelize')
     }
 
     async boot() {

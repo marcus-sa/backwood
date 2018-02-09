@@ -34,7 +34,7 @@ module.exports = class FeathersSequelize {
         this._services = {}
     }
 
-    _start() {
+    /*_start() {
         const { models } = require(this._helpers.appRoot('start/app.js'))
 
         Object.keys(models).forEach(modelName => {
@@ -72,8 +72,6 @@ module.exports = class FeathersSequelize {
                 }
             })
 
-            this._models[modelName] = sequelizeModel
-
             if (typeof model.createService === 'undefined' || model.createService || model.serviceName) {
               const service = require('feathers-sequelize')
               const serviceName = model.serviceName || model.tableName
@@ -93,6 +91,71 @@ module.exports = class FeathersSequelize {
 
             this._ioc.singleton(`Models/${modelName}`, (ioc) => sequelizeModel)
         })
+    }*/
+
+    _start(modelName, namespace) {
+      const sequelizeInstance = this.sequelize
+
+      this._rest._addMethod('model', function (modelName, namespace) {
+        this.middlewareChain.add(() => {
+            const model = this._ioc.use(namespace)
+
+            if (model.prototype instanceof BaseModel === false) {
+              throw new Error(`${model.name} model must extend base model class`)
+            }
+
+            const options = _.merge(model.options, {
+              hooks: model.hooks instanceof Object
+                ? model.hooks
+                : {}
+            })
+
+            const sequelizeModel = sequelizeInstance.define(
+                model.tableName,
+                model.attributes(Sequelize),
+                options
+            )
+
+            if (model.hooks instanceof Function) {
+              model.hooks.bind(sequelizeModel)()
+            }
+
+            Object.getOwnPropertyNames(model).forEach(prop => {
+              if (!sequelizeModel.hasOwnProperty(prop) && model[prop] instanceof Function) {
+                  sequelizeModel[prop] = model[prop].bind(sequelizeModel)
+              }
+            })
+
+            Object.getOwnPropertyNames(model.prototype).forEach(prop => {
+                if (!sequelizeModel.prototype.hasOwnProperty(prop) && model.prototype[prop] instanceof Function) {
+                    sequelizeModel.prototype[prop] = model.prototype[prop].bind(sequelizeModel.prototype)
+                }
+            })
+
+            if (typeof model.createService === 'undefined' || model.createService || model.serviceName) {
+              const service = require('feathers-sequelize')
+              const serviceName = model.serviceName || model.tableName
+
+              this.app.use(serviceName, service({
+                Model: sequelizeModel,
+                events: model.events,
+                id: model.id || 'id',
+                raw: model.raw,
+                paginate: model.paginate
+              })).hooks(model.serviceHooks || {})
+
+              this._ioc.singleton(`Services/${pascalCase(serviceName)}`, () => {
+                return this.app.service(serviceName)
+              })
+            }
+
+            this._ioc.singleton(`Models/${modelName}`, (ioc) => sequelizeModel)
+        })
+
+        return this
+      })
+
+      return this
     }
 
 }

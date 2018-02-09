@@ -4,6 +4,7 @@ const _ = require('lodash')
 const pascalCase = require('pascal-case')
 const express = require('@feathersjs/express')
 
+const Route = require('./Route')
 const RouteManager = require('./Route/Manager')
 
 module.exports = class Rest extends RouteManager {
@@ -46,51 +47,61 @@ module.exports = class Rest extends RouteManager {
   }
 
   _start(options) {
-    const { app } = this
     const start = require(this._helpers.appRoot('start/rest.js'))
-    app.configure(express.rest())
+    this.app.configure(express.rest())
 
     const globalMiddleware = this._createGlobalMiddleware(start.globalMiddleware)
     const namedMiddleware = this._createNamedMiddleware(start.namedMiddleware)
-    const routes = this.routeStore.list()
+    //const routes = this.routeStore.list()
+    const chain = this.middlewareChain.list()
 
-    routes.forEach(route => {
-      route = route.toJSON()
+    chain.forEach(next => {
+      if (next instanceof Route) {
+        const route = next.toJSON()
 
-      const slashes = route.route[0] === '/' ? '' : '/'
-      const path = route.prefix.join('/') + slashes + route.route
+        const slashes = route.route[0] === '/' ? '' : '/'
+        const path = route.prefix.join('/') + slashes + route.route
 
-      if (route.method === 'service') {
-        const { closure } = this.feathers.getServices(route.route)
+        if (route.method === 'service') {
+          const { closure } = this.feathers.getServices(route.route)
 
-        this.feathers._createService(closure, path, this.app)
+          return this.feathers._createService(closure, path, this.app)
+        }
 
-        return null
+        const middleware = route.middleware.map(
+            (name) => namedMiddleware[name]
+        ).concat(globalMiddleware)
+
+        if (typeof route.handler === 'string') {
+            route.handler = this._createHandler(this._controllersPath, ...route.namespace, route.handler)
+        }
+
+        return this.app[route.method](path, ...middleware.concat(route.handler))
       }
 
-      const middleware = route.middleware.map(
-          (name) => namedMiddleware[name]
-      ).concat(globalMiddleware)
-
-      if (typeof route.handler === 'string') {
-          route.handler = this._createHandler(this._controllersPath, ...route.namespace, route.handler)
-      }
-
-      this.app[route.method](path, ...middleware.concat(route.handler))
+      next()
     })
 
     this.app.listen(this._config.port)
     console.info('Feathers REST API is listening on port:', this._config.port)
   }
 
+  _addMethod(methodName, method) {
+    this[methodName] = method.bind(this)
+  }
+
   use(middleware) {
-    this.app.use(middleware)
+    this.middlewareChain.add(() => {
+      this.app.use(middleware)
+    })
 
     return this
   }
 
   configure(middleware) {
-    this.app.configure(middleware)
+    this.middlewareChain.add(() => {
+      this.app.configure(middleware)
+    })
 
     return this
   }
