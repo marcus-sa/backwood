@@ -4,11 +4,13 @@ const _ = require('lodash')
 
 const Route = require('./index')
 const RouteStore = require('./Store')
+const MiddlewareChain = require('../Chain')
 const RouteGroup = require('./Group')
 
 module.exports = class RouteManager {
 
   constructor() {
+    this.middlewareChain = new MiddlewareChain()
     this.routeStore = new RouteStore()
   }
 
@@ -28,6 +30,8 @@ module.exports = class RouteManager {
   route(method, route, handler) {
     const routeInstance = new Route(method, route, handler)
     this.routeStore.add(routeInstance)
+
+    this.middlewareChain.add(routeInstance)
 
     return routeInstance
   }
